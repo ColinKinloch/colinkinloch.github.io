@@ -1,0 +1,12 @@
+@media only screen and (max-width: $header-width + $main-min-width) {
+  .site-header {
+    min-width: 100px;
+    width: 25%;
+  }
+  .site-main {
+    min-width: 0;
+    transition: initial;
+    width: calc(100% - #{$header-position});
+    &.shrink { width: 0;}
+  }
+}

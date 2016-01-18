@@ -1,0 +1,19 @@
+{% set page.nav = "posts" %}
+{% extends 'base.html' %}
+
+{% block content %}
+<article>
+  <header>
+    <div class="tags">
+      {% for tag in page.tags %}
+        <a href="/tag/{{tag}}.html"><span>{{tag}}</span></a>
+      {% endfor %}
+    </div>
+    <h2>{{page.date|date('jS F Y')}}</h2>
+  </header>
+  <main>
+    {{content|safe}}
+  </main>
+</article>
+<!-- TODO Add commets? -->
+{% endblock %}

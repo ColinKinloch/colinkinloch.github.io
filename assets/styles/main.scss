@@ -1,0 +1,28 @@
+@charset 'utf-8';
+
+@import 'font-awesome';
+@import 'node_modules/highlight.js/styles/default';
+
+$site-background: gainsboro;
+$drop-shadow: 0 0 4px black;
+
+$base-font-family: serif;
+$base-font-size: 16px;
+
+$header-background: gainsboro;
+$header-width: 240px;
+$header-position: 25%;
+$header-padding: 8px;
+
+$main-background: rgba(white, .96);
+$main-max-width: 1240px;
+$main-min-width: 552px;
+
+$mobile-width: 400px;
+$tablet-width: 768px;
+
+@import 'includes/base',
+        'includes/layout',
+        'includes/small',
+        'includes/mobile';
+        // 'includes/tablet';

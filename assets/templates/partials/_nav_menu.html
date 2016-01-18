@@ -1,0 +1,4 @@
+<a href="{{ site.urlRoot }}projects.html" {% if page.nav == 'projects' %}class="active"{% endif %}><span>Projects</span></a>
+<a href="{{ site.urlRoot }}demos.html" {% if page.nav == 'demos' %}class="active"{% endif %}><span>Demos</span></a>
+{% if site.posts.length %}<a href="{{ site.urlRoot }}posts.html" {% if page.nav == 'posts' %}class="active"{% endif %}><span>Posts</span></a>{% endif %}
+<a href="{{ site.urlRoot }}cv.html" {% if page.nav == 'cv' %}class="active"{% endif %}><span>CV</span></a>

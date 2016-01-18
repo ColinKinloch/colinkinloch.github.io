@@ -1,0 +1,208 @@
+// @import 'font-awesome';
+
+body {
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.site-html {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.site-body {
+  background: $site-background;
+  display: flex;
+  font-family: $base-font-family;
+  height: inherit;
+  justify-content: flex-start;
+  margin: 0;
+  width: inherit;
+
+  &.dark {
+    background: darken($site-background, 65%);
+  }
+}
+
+.site-main {
+  background: $main-background;
+  box-shadow: $drop-shadow;
+  left: calc(#{$header-position});
+  max-width: $main-max-width;
+  min-height: 100%;
+  min-width: $main-min-width;
+  overflow-x: hidden;
+  position: absolute;
+  transition: width 1s ease-in-out,
+              min-width 1s ease-in-out,
+              box-shadow .5s ease-in-out;
+  width: calc((80% - #{$header-width}));
+
+  &.shrink {;
+    box-shadow: none;
+    display: block;
+    min-width: 0;
+    // overflow-x: hidden;
+    transition: width 1s ease-in-out,
+                min-width 1s ease-in-out,
+                box-shadow 1s ease-in-out .5s;
+    width: 0;
+  }
+
+  article {
+    margin-left: 10px;
+  }
+
+  pre > code {
+    // white-space: pre;
+    // margin-top: -1.00em;
+    background: ghostwhite;
+    border: 1px dashed lightgrey;
+    border-right: 0;
+    display: block;
+    padding: 3px;
+  }
+  // TODO Style code nice
+  // code {}
+
+  object.pdf.cv {
+    // TODO Figure out what makes <object> 4px taller than 100%
+    height: calc(100% - 5px);
+    position: inherit;
+    width: calc(100% - 1px);
+  }
+}
+
+%site-side {
+  box-sizing: border-box;
+  padding: $header-padding;
+  position: fixed;
+  width: $header-position;
+
+  a {
+    color: navy;
+  }
+
+  .dark > & {
+    a {
+      color: gainsboro;
+    }
+  }
+}
+
+.site-header {
+  @extend %site-side;
+
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  // left: calc(#{$header-position} - #{$header-width});
+  padding: $header-padding;
+  position: fixed;
+  // width: $header-width;
+  text-align: right;
+  width: $header-position;
+
+  nav {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    text-transform: lowercase;
+
+    a {
+      margin-top: 0 3px;
+    }
+
+    .active {
+      font-weight: bold;
+    }
+  }
+
+  address {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-top: 8px;
+  }
+
+  .site-title {
+    font-weight: normal;
+    margin: 0 0 8px;
+  }
+
+}
+
+.ident {
+  font-size: 12pt;
+  margin: 0;
+
+  .email {
+    font-weight: normal;
+  }
+
+  .name {
+    font-weight: bold;
+  }
+}
+
+.social {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 3px;
+
+  .icon-button {
+    font-size: 22px;
+  }
+}
+
+.icon-button {
+  @include fa-icon();
+
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 3px;
+  text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(#aaa, .6);
+    text-decoration: none;
+  }
+}
+
+.site-footer {
+  @extend %site-side;
+
+  bottom: 0;
+}
+
+#settings {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.fullscreen {
+  height: 100%;
+  position: fixed;
+  width: 100%;
+}
+
+.site-background {
+  z-index: -1;
+
+  canvas {
+    height: inherit;
+    image-rendering: crisp-edges;
+    // image-rendering: pixelated;
+    width: inherit;
+  }
+}

@@ -1,0 +1,49 @@
+@media only screen and (max-width: $mobile-width) {
+  .site-html {
+    width: 100%;
+  }
+
+  .site-body {
+    flex-direction: column;
+    width: inherit;
+  }
+
+  .site-main {
+    left: initial;
+    width: inherit;
+    min-width: initial;
+    max-width: initial;
+    transition: initial;
+    position: initial;
+    min-height: initial;
+    flex: 1 0 auto;
+  }
+
+  .site-header {
+    align-items: flex-start;
+    position: initial;
+    height: initial;
+    // width: $mobile-width;
+    flex-direction: row;
+    nav {
+      flex-direction: row;
+      a {
+        padding: 0 4px;
+      }
+    }
+  }
+
+  .site-footer {
+    bottom: initial;
+    left: initial;
+    position: initial;
+  }
+
+  .fullscreen {
+    // width: $mobile-width;
+  }
+
+  .site-background {
+    width: inherit;
+  }
+}

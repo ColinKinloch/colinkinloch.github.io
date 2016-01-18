@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html class="site-html">
+  <head>
+    <title>{% if page.title %}{{page.title}} - {% endif %}{{site.title}}</title>
+    <link rel="shortcut icon" href="{{site.urlRoot}}favicon.ico"></link>
+    <link rel="stylesheet" type="text/css" href="{{ site.urlRoot }}styles/main.css">
+    <link rel="alternate" type="application/rss+xml" title="{{site.title}}'s Posts" href="{{ site.urlRoot }}posts.xml">
+    {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="author" content="{{ page.author.name || site.author.name }}">
+  </head>
+  <body class="site-body">
+    <div id="background" class="site-background fullscreen"></div>
+    <header class="site-header">
+      <a href="{{ site.urlRoot }}"><h1 class="site-title">{{site.title}}</h1></a>
+      <nav>
+        {% include 'partials/_nav_menu.html' %}
+      </nav>
+    </header>
+    <main class="site-main">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+      <div id="settings">
+        <a id="play-background" class="icon-button fa-play"></a>
+        <a id="show-background" onclick="" class="icon-button fa-picture-o"></a>
+        <a id="dark-background" onclick="" class="icon-button fa-moon-o"></a>
+        <select id="model-background">
+          <option value="box.glb">Box</option>
+          <option value="duck.glb">Duck</option>
+        </select>
+      </div>
+      <address>
+        <h5 class="ident">
+          <a href="{{ site.urlRoot }}colin-kinloch.asc" class="name">{{site.author.name}}</a>
+          <a class="email" href="mailto:{{site.author.email}}">&lt;{{site.author.email}}&gt;</a>
+        </h5>
+        <div class="social">
+          {% include 'partials/_social_links.html' %}
+        </div>
+      </address>
+    </footer>
+    <script src="{{ site.urlRoot }}scripts/main.js"></script>
+  </body>
+</html>

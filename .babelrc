@@ -1,0 +1,9 @@
+{
+  "presets": ["es2015"],
+  "plugins": ["babel-polyfill"],
+  "env": {
+    "development": {
+      "sourceMaps": true
+    }
+  }
+}

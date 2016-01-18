@@ -1,0 +1,15 @@
+module.exports = {
+  title: 'Colin Kinloch',
+  author: {
+    name: 'Colin Kinloch',
+    email: 'colin@kinlo.ch',
+    github: 'ColinKinloch',
+    linkedin: 'ColinKinloch',
+    // twitter: 'ColinKinloch',
+    codepen: 'ColinKinloch',
+    shadertoy: 'ColinKinloch'
+  },
+  url: 'colin.kinlo.ch',
+  urlRoot: '/',
+  date: new Date()
+}
