@@ -1,6 +1,5 @@
 {
   "presets": ["es2015-webpack"],
-  "plugins": ["babel-polyfill"],
   "env": {
     "development": {
       "sourceMaps": true

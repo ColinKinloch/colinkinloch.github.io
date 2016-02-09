@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import {isUndefined as _isUndefined} from 'lodash'
 
 module.exports = class Accessor {
   constructor (id, acc, buffer) {
@@ -9,8 +9,8 @@ module.exports = class Accessor {
     // Assuming GL type
     this.componentType = acc.componentType
     this.count = acc.count
-    if (!_.isUndefined(acc.max)) this.max = acc.max.slice()
-    if (!_.isUndefined(acc.min)) this.min = acc.min.slice()
+    if (!_isUndefined(acc.max)) this.max = acc.max.slice()
+    if (!_isUndefined(acc.min)) this.min = acc.min.slice()
     this.type = acc.type
 
     switch (this.type) {

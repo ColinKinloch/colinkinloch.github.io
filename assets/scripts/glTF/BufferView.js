@@ -1,4 +1,4 @@
-const _ = require('lodash')
+import {isUndefined as _isUndefined} from 'lodash'
 
 module.exports = class BufferView {
   constructor (id, bV, data) {
@@ -12,7 +12,7 @@ module.exports = class BufferView {
 
   // TODO Don't deal with gl here
   buffer (gl, usage = gl.STATIC_DRAW) {
-    if (_.isUndefined(this.target)) return
+    if (_isUndefined(this.target)) return
     if (this.gl === null) {
       this.gl = gl.createBuffer()
     }
