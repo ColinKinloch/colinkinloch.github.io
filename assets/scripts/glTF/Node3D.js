@@ -1,4 +1,4 @@
-const glm = require('gl-matrix')
+import glm from 'gl-matrix'
 
 module.exports = class Node3D {
   constructor (node) {

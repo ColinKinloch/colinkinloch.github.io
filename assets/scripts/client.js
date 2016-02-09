@@ -1,13 +1,22 @@
 'use strict'
 
-const _ = require('lodash')
-const performance = require('usertiming')
-const navigationStart = _.get(performance, 'timing.navigationStart') || +(new Date())
+import {get as _get, pick as _pick} from 'lodash'
+import performance from 'usertiming'
+
+import glm from 'gl-matrix'
+import {processGLTF, parseBinary, detectMime} from './glTF'
+
+import shaderMainVertex from './shaders/main.glslv'
+import shaderMainFragment from './shaders/main.glslf'
+import shaderPostVertex from './shaders/lib/post.glslv'
+import shaderPostDithering from './shaders/dithering.glslf'
+
+const navigationStart = _get(performance, 'timing.navigationStart') || +(new Date())
 
 const shaderProgram = (gl, shaders) => {
   for (const shader of shaders) {
     const shad = gl.createShader(shader[0])
-    const source = require(shader[1])
+    const source = shader[1]
     gl.shaderSource(shad, source)
     gl.compileShader(shad)
     if (!gl.getShaderParameter(shad, gl.COMPILE_STATUS)) {
@@ -86,9 +95,9 @@ const drawToFramebuffer = (gl, program, source) => {
     // TODO clean up graphics memory, create renderer, state management etc.
     if (scenes.has(model)) return (scene = scenes.get(model))
     fetch(model)
-      .then(glTF.detectMime)
-      .then(glTF.parseBinary)
-      .then(glTF.processGLTF)
+      .then(detectMime)
+      .then(parseBinary)
+      .then(processGLTF)
       .then((g) => {
         console.log(g)
         scenes.set(model, g.root)
@@ -100,10 +109,6 @@ const drawToFramebuffer = (gl, program, source) => {
         console.error(err)
       })
   }
-
-  const glm = require('gl-matrix')
-
-  const glTF = require('./glTF')
 
   const settingsEl = document.querySelector('div#settings')
   const main = document.querySelector('main.site-main')
@@ -152,7 +157,7 @@ const drawToFramebuffer = (gl, program, source) => {
     },
     get model () { return this._model },
     toJSON: function () {
-      return _.pick(this, ['play', 'model', 'dark'])
+      return _pick(this, ['play', 'model', 'dark'])
     }
   }
 
@@ -259,8 +264,8 @@ const drawToFramebuffer = (gl, program, source) => {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   const ditherPost = shaderProgram(gl, new Map([
-    [gl.VERTEX_SHADER, './shaders/lib/post.glslv'],
-    [gl.FRAGMENT_SHADER, './shaders/dithering.glslf']
+    [gl.VERTEX_SHADER, shaderPostVertex],
+    [gl.FRAGMENT_SHADER, shaderPostDithering]
   ]))
   const bayerLoc = gl.getUniformLocation(ditherPost, 'bayer')
   gl.useProgram(ditherPost)
@@ -321,8 +326,8 @@ const drawToFramebuffer = (gl, program, source) => {
   }
 
   const mainProg = shaderProgram(gl, new Map([
-    [gl.FRAGMENT_SHADER, './shaders/main.glslf'],
-    [gl.VERTEX_SHADER, './shaders/main.glslv']])
+    [gl.FRAGMENT_SHADER, shaderMainFragment],
+    [gl.VERTEX_SHADER, shaderMainVertex]])
   )
   gl.useProgram(mainProg)
 

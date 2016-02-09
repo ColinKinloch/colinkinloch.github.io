@@ -1,13 +1,12 @@
-const _ = require('lodash')
-if (_.isUndefined(window.TextDecoder)) window.TextDecoder = require('text-encoding').TextDecoder
+import {TextDecoder} from 'text-encoding'
 
-const BufferView = require('./BufferView')
-const Shader = require('./Shader')
-const Program = require('./Program')
-const Accessor = require('./Accessor')
-const Technique = require('./Technique')
-const Mesh = require('./Mesh')
-const Node3D = require('./Node3D')
+import BufferView from './BufferView'
+import Shader from './Shader'
+import Program from './Program'
+import Accessor from './Accessor'
+import Technique from './Technique'
+import Mesh from './Mesh'
+import Node3D from './Node3D'
 
 const detectMime = (response) => {
   switch (response.headers.get('Content-Type')) {
@@ -142,9 +141,9 @@ const processGLTF = (glTF) => {
   })
 }
 
-module.exports = {
-  parseBinary: parseBinary,
-  processGLTF: processGLTF,
-  detectMime: detectMime,
-  getBuffers: getBuffers
+export {
+  parseBinary,
+  processGLTF,
+  detectMime,
+  getBuffers
 }
