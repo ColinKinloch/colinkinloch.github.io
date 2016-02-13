@@ -1,8 +1,11 @@
 'use strict'
 
 const path = require('path')
+const fs = require('fs')
 
 const _ = require('lodash')
+const glob = require('glob')
+const vfs = require('vinyl-fs')
 const del = require('del')
 
 const gulp = require('gulp')
@@ -11,7 +14,7 @@ const through = require('through2')
 const merge = require('merge-stream')
 
 const livereload = require('gulp-livereload')
-const frontMatter = require('gulp-front-matter')
+const gFrontMatter = require('gulp-front-matter')
 const marked = require('marked')
 const markdown = require('gulp-marked')
 const highlight = require('highlight.js')
@@ -20,6 +23,8 @@ const ghPages = require('gulp-gh-pages')
 const autoprefixer = require('gulp-autoprefixer')
 const webpack = require('webpack')
 const minify = require('gulp-uglify')
+const yaml = require('gulp-yaml')
+const frontMatter = require('front-matter')
 
 const swig = require('swig')
 const swigExtras = require('swig-extras')
@@ -36,7 +41,7 @@ const mdHighlight = (code) => {
   return highlight.highlightAuto(code).value
 }
 
-const rePostName = /(\d{4})-(\d{1,2})-(\d{1,2})-(.*)/
+const rePostName = /(\d{4})-(\d{1,2})-(\d{1,2})-?(.*)/
 
 const parseFilename = () => {
   return through.obj(function (file, enc, done) {
@@ -151,9 +156,131 @@ gulp.task('build', ['content', 'scripts', 'styles', 'fonts', 'misc'])
 
 gulp.task('content', ['pages', 'posts', 'rss'])
 
+const dateTitleMatch = /(\d{4}-\d{1,2}-\d{1,2})-?(.*)/
+
+// Parse posts, store as posts.json
+// post: {
+//   date: Date,
+//   title: Title,
+//   url: Dist relative path,
+//   summary: TBD String,
+//   layout: Basename of template file,
+//   content: Content,
+//   tags: Array of tags,
+//   _source: Source file type
+// }
+gulp.task('collate', (done) => {
+  const postProms = []
+  // Process all directory posts
+  const dirs = glob.sync('content/posts/*/')
+  for (const dir of dirs) {
+    postProms.push(new Promise((resolve, reject) => {
+      const data = {
+        _path: dir
+      }
+      // Parse path
+      {
+        const basename = path.basename(dir)
+        const match = dateTitleMatch.exec(basename)
+        if (match[2].length) data.title = _.capitalize(path.parse(match[2]).name.split('-').join(' '))
+        data.date = new Date(match[1])
+      }
+      fs.readdir(dir, (err, files) => {
+        if (err) reject(err)
+        // Parse frontmatter and content
+        try {
+          const index = fs.readFileSync(dir + 'index.html').toString()
+          const metadata = frontMatter(index)
+          _.extend(data, metadata.attributes)
+          data._source = 'html'
+          data.content = metadata.body
+        } catch (err) {
+          try {
+            const index = fs.readFileSync(dir + 'index.md').toString()
+            const metadata = frontMatter(index)
+            _.extend(data, metadata.attributes)
+            data._source = 'markdown'
+            data.content = metadata.body
+          } catch (err) {}
+        }
+        // Parse metadata file
+        try {
+          const metadata = fs.readFileSync(dir + 'metadata.yaml').toString()
+          _.extend(data, frontMatter(metadata).attributes)
+        } catch (err) {}
+        if (_.isUndefined(data.title)) data.title = 'Untitled'
+        resolve(data)
+      })
+    }))
+  }
+
+  // Process all html or md files
+  const paths = glob.sync('content/posts/!(_)*.@(html|md)')
+  for (const p of paths) {
+    postProms.push(new Promise((resolve, reject) => {
+      const data = {
+        _path: p
+      }
+      // Parse path
+      {
+        const basename = path.basename(p)
+        const match = dateTitleMatch.exec(basename)
+        data.date = new Date(match[1])
+        if (match[2].length) data.title = _.capitalize(_.lowerCase(path.parse(match[2]).name))
+      }
+      fs.readFile(p, (err, buffer) => {
+        if (err) reject(err)
+        // Parse frontmatter and content
+        const file = buffer.toString()
+        const metadata = frontMatter(file)
+        _.extend(data, metadata.attributes)
+        if (_.isUndefined(data.title)) data.title = 'Untitled'
+        data.content = metadata.body
+        resolve(data)
+      })
+    }))
+  }
+
+  return Promise.all([
+    new Promise((resolve, reject) => {
+      fs.readFile('./site.config.json', (err, data) => {
+        if (err) reject(err)
+        resolve(JSON.parse(data.toString()))
+      })
+    }),
+    Promise.all(postProms)
+  ])
+    .then((resp) => {
+      const site = resp[0]
+      site.date = new Date()
+      site.posts = resp[1]
+      for (const post of site.posts) {
+        post.date = new Date(post.date)
+        post._title = _.kebabCase(post.title)
+        const d = post.date
+        const dest = `${d.getFullYear()}/${d.getMonth()}/${d.getDate()}/${post._title}`
+        post.url = '/posts/' + dest
+        if (fs.statSync(post._path).isDirectory()) {
+          // Copy directory content excluding index.* and markdown.yaml
+        }
+
+        switch (post._source) {
+          case 'markdown':
+            break
+          case 'html':
+            break
+        }
+        console.log(post.title, post.date, '=>', post.url)
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+})
+
 gulp.task('pages', ['posts'], () => {
   const mdPages = gulp.src(['content/**/!(_)*.md', '!content/posts/*'])
-    .pipe(frontMatter({property: 'page', remove: true}))
+    .pipe(gFrontMatter({property: 'page', remove: true}))
     .pipe(parseFilename())
     .pipe(processSwig())
     .pipe(summarizeMD('<!--more-->'))
@@ -164,7 +291,7 @@ gulp.task('pages', ['posts'], () => {
     }))
 
   const htmlPages = gulp.src(['content/**/!(_)*.html', '!content/posts/*'])
-    .pipe(frontMatter({property: 'page', remove: true}))
+    .pipe(gFrontMatter({property: 'page', remove: true}))
     .pipe(parseFilename())
     .pipe(processSwig())
     .pipe(summarize('<!--more-->'))
@@ -176,7 +303,7 @@ gulp.task('pages', ['posts'], () => {
 
 gulp.task('posts', () => {
   const mdPosts = gulp.src('content/posts/!(_)*.md')
-    .pipe(frontMatter({property: 'page', remove: true}))
+    .pipe(gFrontMatter({property: 'page', remove: true}))
     .pipe(parseFilename())
     .pipe(processSwig())
     .pipe(summarizeMD('<!--more-->'))
@@ -187,7 +314,7 @@ gulp.task('posts', () => {
     }))
 
   const htmlPosts = gulp.src('content/posts/!(_)*.html')
-    .pipe(frontMatter({property: 'page', remove: true}))
+    .pipe(gFrontMatter({property: 'page', remove: true}))
     .pipe(parseFilename())
     .pipe(processSwig())
     .pipe(summarize('<!--more-->'))
@@ -220,7 +347,7 @@ gulp.task('rss', ['posts'], () => {
     .pipe(gulp.dest('dist'))
 })
 
-gulp.task('scripts', ['minify'])
+gulp.task('scripts', ['webpack'])
 gulp.task('webpack', (done) => {
   const webpackConfig = require('./webpack.config')
   webpack(webpackConfig)
@@ -231,8 +358,8 @@ gulp.task('webpack', (done) => {
   })
 })
 gulp.task('minify', ['webpack'], () => {
-  return gulp.src('./dist/scripts/**/*')
-    // .pipe(minify())
+  return gulp.src('./dist/scripts/**/*.js')
+    .pipe(minify())
     .pipe(gulp.dest('./dist/scripts'))
 })
 
