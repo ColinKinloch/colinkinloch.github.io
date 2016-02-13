@@ -6,8 +6,10 @@ const https = require('https')
 module.exports = (opts) => {
   const koa = require('koa')
   const serve = require('koa-static')
+  const compress = require('koa-compress')
   var httpServer, httpsServer
   httpServer = koa()
+    .use(compress())
     .use(serve('dist'))
     // TODO 404
     .use(function *() {

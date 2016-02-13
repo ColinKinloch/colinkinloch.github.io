@@ -13,5 +13,6 @@ module.exports = {
       { test: /\.(frag|vect|glsl[vf]?)$/, exclude: /node_modules/, loader: 'raw' },
       { test: /\.(frag|vect|glsl[vf]?)$/, exclude: /node_modules/, loader: 'glslify' }
     ]
-  }
+  },
+  devtool: 'source-map'
 }
